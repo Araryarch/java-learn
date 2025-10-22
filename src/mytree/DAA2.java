@@ -12,7 +12,6 @@ public class DAA2 extends DAA1 {
         int rightH = height(t.getRight());
         if (Math.abs(leftH - rightH) > 1) return false;
         return isHeightBalanced(t.getLeft()) && isHeightBalanced(t.getRight());
-        // Write your codes in here
 	}
 
     // helper untuk tinggi pohon
@@ -33,7 +32,6 @@ public class DAA2 extends DAA1 {
             t = rebalanceForRight(t);
         }
         return t;
-        // Write your codes in here
 	}
 
 	// rebalanceForLeft is called when the left subtree of t may have
@@ -62,7 +60,6 @@ public class DAA2 extends DAA1 {
             }
         }
         return t;
-        // Write your codes in here
 	}
 	
 	// 7. rebalanceForRight() [15 points]
@@ -82,7 +79,6 @@ public class DAA2 extends DAA1 {
             }
         }
         return t;
-        // Write your codes in here
 	}
 	
 	// 8. deleteHB() [10 points]
@@ -118,7 +114,6 @@ public class DAA2 extends DAA1 {
             }
         }
         return t;
-        // Write your codes in here
 	}
 
     // helper rotation functions

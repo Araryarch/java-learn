@@ -44,11 +44,8 @@ public class DAA1 extends MyTree {
     
     public static int max(MyTree t) {
         if (t.getEmpty()) return Integer.MIN_VALUE;
-        MyTree current = t;
-        while (!current.getRight().getEmpty()) {
-            current = current.getRight();
-        }
-        return current.getValue();
+        if (t.getRight().getEmpty()) return t.getValue();
+        return max(t.getRight());
     }
 
 }

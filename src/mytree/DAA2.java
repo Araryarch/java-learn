@@ -7,31 +7,34 @@ public class DAA2 extends DAA1 {
 	// 4. isHeightBalanced() [10 points]
 	public static boolean isHeightBalanced(MyTree t) {
 		// Write your codes in here
-        if (t.getEmpty()) return true;
-        int leftH = height(t.getLeft());
-        int rightH = height(t.getRight());
-        if (Math.abs(leftH - rightH) > 1) return false;
-        return isHeightBalanced(t.getLeft()) && isHeightBalanced(t.getRight());
+		if (t.getEmpty()) return true;
+
+		int leftHeight = getHeight(t.getLeft());
+		int rightHeight = getHeight(t.getRight());
+
+		if (Math.abs(leftHeight - rightHeight) > 1) return false;
+
+		return isHeightBalanced(t.getLeft()) && isHeightBalanced(t.getRight());
 	}
 
-    // helper untuk tinggi pohon
-    private static int height(MyTree t) {
-        if (t.getEmpty()) return 0;
-        return 1 + Math.max(height(t.getLeft()), height(t.getRight()));
-    }
+	private static int getHeight(MyTree t) {
+		if (t.getEmpty()) return 0;
+		return 1 + Math.max(getHeight(t.getLeft()), getHeight(t.getRight()));
+	}
 
 	// 5. insertHB() [10 points]
 	public static MyTree insertHB(int n, MyTree t) {
 		// Write your codes in here
-        if (t.getEmpty()) return new MyTree(n, new MyTree(), new MyTree());
-        if (n < t.getValue()) {
-            t = new MyTree(t.getValue(), insertHB(n, t.getLeft()), t.getRight());
-            t = rebalanceForLeft(t);
-        } else if (n > t.getValue()) {
-            t = new MyTree(t.getValue(), t.getLeft(), insertHB(n, t.getRight()));
-            t = rebalanceForRight(t);
-        }
-        return t;
+		if (t.getEmpty()) return new MyTree(n, new MyTree(), new MyTree());
+
+		if (n < t.getValue()) {
+			t = new MyTree(t.getValue(), insertHB(n, t.getLeft()), t.getRight());
+			t = rebalanceForLeft(t);
+		} else if (n > t.getValue()) {
+			t = new MyTree(t.getValue(), t.getLeft(), insertHB(n, t.getRight()));
+			t = rebalanceForRight(t);
+		}
+		return t;
 	}
 
 	// rebalanceForLeft is called when the left subtree of t may have
@@ -46,41 +49,69 @@ public class DAA2 extends DAA1 {
 	// 6. rebalanceForLeft() [15 points]
 	private static MyTree rebalanceForLeft(MyTree t) {
 		// Write your codes in here
-        if (t.getEmpty()) return t;
-        int lh = height(t.getLeft());
-        int rh = height(t.getRight());
-        if (lh - rh == 2) {
-            MyTree left = t.getLeft();
-            if (height(left.getLeft()) >= height(left.getRight())) {
-                // single rotation (LL)
-                t = rotateRight(t);
-            } else {
-                // double rotation (LR)
-                t = rotateLeftRight(t);
-            }
-        }
-        return t;
+		if (t.getEmpty()) return t;
+
+		int leftHeight = getHeight(t.getLeft());
+		int rightHeight = getHeight(t.getRight());
+
+		if (leftHeight - rightHeight == 2) {
+			MyTree left = t.getLeft();
+			int ll = getHeight(left.getLeft());
+			int lr = getHeight(left.getRight());
+
+			if (ll >= lr) {
+				MyTree newRoot = left;
+				MyTree moved = newRoot.getRight();
+				t = new MyTree(newRoot.getValue(),
+						newRoot.getLeft(),
+						new MyTree(t.getValue(), moved, t.getRight()));
+			} else {
+				MyTree child = left.getRight();
+				MyTree a = left.getLeft();
+				MyTree b = child.getLeft();
+				MyTree c = child.getRight();
+				MyTree d = t.getRight();
+				t = new MyTree(child.getValue(),
+						new MyTree(left.getValue(), a, b),
+						new MyTree(t.getValue(), c, d));
+			}
+		}
+		return t;
 	}
-	
+
 	// 7. rebalanceForRight() [15 points]
 	private static MyTree rebalanceForRight(MyTree t) {
 		// Write your codes in here
-        if (t.getEmpty()) return t;
-        int lh = height(t.getLeft());
-        int rh = height(t.getRight());
-        if (rh - lh == 2) {
-            MyTree right = t.getRight();
-            if (height(right.getRight()) >= height(right.getLeft())) {
-                // single rotation (RR)
-                t = rotateLeft(t);
-            } else {
-                // double rotation (RL)
-                t = rotateRightLeft(t);
-            }
-        }
-        return t;
+		if (t.getEmpty()) return t;
+
+		int leftHeight = getHeight(t.getLeft());
+		int rightHeight = getHeight(t.getRight());
+
+		if (rightHeight - leftHeight == 2) {
+			MyTree right = t.getRight();
+			int rr = getHeight(right.getRight());
+			int rl = getHeight(right.getLeft());
+
+			if (rr >= rl) {
+				MyTree newRoot = right;
+				MyTree moved = newRoot.getLeft();
+				t = new MyTree(newRoot.getValue(),
+						new MyTree(t.getValue(), t.getLeft(), moved),
+						newRoot.getRight());
+			} else {
+				MyTree child = right.getLeft();
+				MyTree a = t.getLeft();
+				MyTree b = child.getLeft();
+				MyTree c = child.getRight();
+				MyTree d = right.getRight();
+				t = new MyTree(child.getValue(),
+						new MyTree(t.getValue(), a, b),
+						new MyTree(right.getValue(), c, d));
+			}
+		}
+		return t;
 	}
-	
+
 	// 8. deleteHB() [10 points]
 	/**
 	 * Deletes the value 'x' from the given tree, if it exists, and returns the new
@@ -90,62 +121,34 @@ public class DAA2 extends DAA1 {
 	 */
 	public static MyTree deleteHB(MyTree t, int x) {
 		// Write your codes in here
-        if (t.getEmpty()) return t;
+		if (t.getEmpty()) return t;
 
-        int val = t.getValue();
-        if (x < val) {
-            t = new MyTree(val, deleteHB(t.getLeft(), x), t.getRight());
-            t = rebalanceForRight(t);
-        } else if (x > val) {
-            t = new MyTree(val, t.getLeft(), deleteHB(t.getRight(), x));
-            t = rebalanceForLeft(t);
-        } else {
-            // node found
-            if (t.getLeft().getEmpty() && t.getRight().getEmpty()) {
-                return new MyTree();
-            } else if (t.getLeft().getEmpty()) {
-                return t.getRight();
-            } else if (t.getRight().getEmpty()) {
-                return t.getLeft();
-            } else {
-                int successor = minValue(t.getRight());
-                t = new MyTree(successor, t.getLeft(), deleteHB(t.getRight(), successor));
-                t = rebalanceForLeft(t);
-            }
-        }
-        return t;
+		int val = t.getValue();
+
+		if (x < val) {
+			t = new MyTree(val, deleteHB(t.getLeft(), x), t.getRight());
+			t = rebalanceForRight(t);
+		} else if (x > val) {
+			t = new MyTree(val, t.getLeft(), deleteHB(t.getRight(), x));
+			t = rebalanceForLeft(t);
+		} else {
+			if (t.getLeft().getEmpty() && t.getRight().getEmpty()) {
+				return new MyTree();
+			} else if (t.getLeft().getEmpty()) {
+				return t.getRight();
+			} else if (t.getRight().getEmpty()) {
+				return t.getLeft();
+			} else {
+				int successor = findMin(t.getRight());
+				t = new MyTree(successor, t.getLeft(), deleteHB(t.getRight(), successor));
+				t = rebalanceForLeft(t);
+			}
+		}
+		return t;
 	}
 
-    // helper rotation functions
-    private static MyTree rotateRight(MyTree t) {
-        MyTree newRoot = t.getLeft();
-        MyTree movedSub = newRoot.getRight();
-        return new MyTree(newRoot.getValue(), newRoot.getLeft(),
-                new MyTree(t.getValue(), movedSub, t.getRight()));
-    }
-
-    private static MyTree rotateLeft(MyTree t) {
-        MyTree newRoot = t.getRight();
-        MyTree movedSub = newRoot.getLeft();
-        return new MyTree(newRoot.getValue(),
-                new MyTree(t.getValue(), t.getLeft(), movedSub), newRoot.getRight());
-    }
-
-    private static MyTree rotateLeftRight(MyTree t) {
-        return rotateRight(new MyTree(t.getValue(),
-                rotateLeft(t.getLeft()), t.getRight()));
-    }
-
-    private static MyTree rotateRightLeft(MyTree t) {
-        return rotateLeft(new MyTree(t.getValue(),
-                t.getLeft(), rotateRight(t.getRight())));
-    }
-
-    private static int minValue(MyTree t) {
-        MyTree current = t;
-        while (!current.getLeft().getEmpty()) {
-            current = current.getLeft();
-        }
-        return current.getValue();
-    }
+	private static int findMin(MyTree t) {
+		if (t.getLeft().getEmpty()) return t.getValue();
+		return findMin(t.getLeft());
+	}
 }
